@@ -1,0 +1,19 @@
+{
+  "name": "f4iw2-installer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "seed:init": "ts-node ./src/seeds/init.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.8",
+    "nodemon": "^3.1.4",
+    "typescript": "^5.5.2"
+  }
+}

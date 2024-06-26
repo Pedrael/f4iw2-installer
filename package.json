@@ -6,14 +6,22 @@
   "seed:init": "ts-node ./src/seeds/init.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "nodemon index.ts"
+    "serve": "nodemon index.ts",
+    "start": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/inquirer": "^9.0.7",
     "@types/node": "^20.14.8",
+    "commander": "^12.1.0",
     "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "inquirer": "^8.0.0"
   }
 }

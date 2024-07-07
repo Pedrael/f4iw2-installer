@@ -1,5 +1,5 @@
 import http from 'http'
-const cors = require('cors')
+import cors from 'cors'
 import { aquireDownloadLink } from './src/connect'
 
 const PORT = 3000

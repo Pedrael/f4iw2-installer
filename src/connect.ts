@@ -4,6 +4,7 @@ import { mo2 } from './keys.json'
 import { RequestOptions } from 'https'
 import { findURIUsingAddress, manualSelectUI } from './manualSelect'
 import { CDNAddress, CDNNames } from './types'
+import { downloadFileWithProgressBar } from './downloadService'
 
 export const aquireDownloadLink = (hostname: string, path: string) => {
   // Define request options
@@ -33,8 +34,9 @@ export const aquireDownloadLink = (hostname: string, path: string) => {
 
     res.on('end', async () => {
       const { short_name } = await manualSelectUI()
-      console.log(
+      downloadFileWithProgressBar(
         findURIUsingAddress(JSON.parse(data) as CDNAddress[], short_name).URI,
+        './down',
       )
     })
   })

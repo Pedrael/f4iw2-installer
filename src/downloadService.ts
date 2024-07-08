@@ -2,38 +2,28 @@ import axios from 'axios'
 import ProgressBar from 'progress'
 import fs from 'fs'
 import path from 'path'
-
-export const sanitizeFilename = (filename: string) => {
-  return filename.replace(/[^a-zA-Z0-9.]/g, '_')
-}
+import { createDirectoryIfNotExists, sanitizeFilename } from './util'
 
 export const downloadFileWithProgressBar = async (
   url: string,
   outputPath: string,
 ) => {
   try {
+    const sanitizedFilename = sanitizeFilename(path.basename(url).split('?')[0])
+    const filename: string = path.join(outputPath, sanitizedFilename)
+
+    if (fs.existsSync(filename)) {
+      console.log(`File already exists, skip: ${sanitizedFilename}`)
+      return filename
+    }
+
     const { data, headers } = await axios({
       url,
       method: 'GET',
       responseType: 'stream',
     })
 
-    // Extract filename from Content-Disposition header if available
-    const sanitizedFilename = sanitizeFilename(path.basename(url).split('?')[0])
-    const filename: string = path.join(outputPath, sanitizedFilename)
-
-    console.log(`Sanitized filename: ${sanitizedFilename}`)
-    console.log(`Full output path: ${filename}`)
-
-    // Ensure the output directory exists
-    if (!fs.existsSync(outputPath)) {
-      console.log(
-        `Output directory does not exist. Creating directory: ${outputPath}`,
-      )
-      fs.mkdirSync(outputPath, { recursive: true })
-    } else {
-      console.log(`Output directory exists: ${outputPath}`)
-    }
+    createDirectoryIfNotExists(outputPath)
 
     const totalLength = headers['content-length']
     const progressBar = new ProgressBar(
@@ -68,12 +58,13 @@ export const downloadFileWithProgressBar = async (
     // Listen for errors on the writer stream
     writer.on('error', onError)
 
-    writer.on('finish', () => {
-      console.log('Download complete')
-    })
+    // writer.on('finish', () => {
+    //   console.log('Download complete')
+    // })
 
     data.on('end', () => {
-      console.log('Download process ended.')
+      console.log(`Finish downloading ${sanitizedFilename}`)
+      return filename
     })
   } catch (error) {
     console.error('Error during download:', error)

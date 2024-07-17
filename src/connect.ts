@@ -7,6 +7,7 @@ import { CDNAddress, CDNNames } from './types'
 import { downloadFileWithProgressBar } from './downloadService'
 import { unzipFile } from './unzipperService'
 import { getFilenameWithoutExtension } from './util'
+import { executeFileManipulation, FileActionsList } from './fileManipulator'
 
 export const aquireDownloadLink = (hostname: string, URL: string) => {
   // Define request options
@@ -44,10 +45,11 @@ export const aquireDownloadLink = (hostname: string, URL: string) => {
         filename,
         './down',
       )
-      await unzipFile(
-        './down/Eli_Armour_Compendium.rar',
-        `./unzipped/${await getFilenameWithoutExtension(filename)}`,
-      )
+      // await unzipFile(
+      //   filedownloaded, //'./down/Eli_Armour_Compendium.rar',
+      //   `./unzipped/${await getFilenameWithoutExtension(filename)}`,
+      // )
+      await executeFileManipulation(FileActionsList.delete, './moved')
     })
   })
 

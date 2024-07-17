@@ -5,13 +5,15 @@ import { RequestOptions } from 'https'
 import { findURIUsingAddress, manualSelectUI } from './manualSelect'
 import { CDNAddress, CDNNames } from './types'
 import { downloadFileWithProgressBar } from './downloadService'
+import { unzipFile } from './unzipperService'
+import { getFilenameWithoutExtension } from './util'
 
-export const aquireDownloadLink = (hostname: string, path: string) => {
+export const aquireDownloadLink = (hostname: string, URL: string) => {
   // Define request options
   const options: RequestOptions = {
     hostname: hostname,
     port: 443,
-    path: path,
+    path: URL,
     method: 'GET',
     headers: {
       apikey: mo2,
@@ -34,9 +36,17 @@ export const aquireDownloadLink = (hostname: string, path: string) => {
 
     res.on('end', async () => {
       const { short_name } = await manualSelectUI()
-      downloadFileWithProgressBar(
-        findURIUsingAddress(JSON.parse(data) as CDNAddress[], short_name).URI,
+      const filename = findURIUsingAddress(
+        JSON.parse(data) as CDNAddress[],
+        short_name,
+      ).URI
+      const filedownloaded = await downloadFileWithProgressBar(
+        filename,
         './down',
+      )
+      await unzipFile(
+        './down/Eli_Armour_Compendium.rar',
+        `./unzipped/${await getFilenameWithoutExtension(filename)}`,
       )
     })
   })

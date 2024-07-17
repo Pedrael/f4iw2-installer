@@ -1,6 +1,6 @@
 import StreamZip from 'node-stream-zip'
 import SevenZip from '7zip-min'
-import Unrar from 'unrar'
+import { createExtractorFromFile } from 'node-unrar-js'
 import fs from 'fs'
 import path from 'path'
 import ProgressBar from 'progress'
@@ -71,13 +71,53 @@ const useZip = async (archivePath: string, outputPath: string) => {
   }
 }
 
-const useRar = (archivePath: string, outputPath: string) => {
-  const extractor = new Unrar(archivePath)
-  extractor.extract(outputPath, null, (err) => {
-    err
-      ? console.error('Error extracting RAR archive:', err)
-      : console.log(`Extracted to ${outputPath}`)
+const useZipWithProgress = async (
+  archivePath: string,
+  outputDirectory: string,
+) => {
+  createDirectoryIfNotExists(outputDirectory)
+
+  const zip = new StreamZip.async({ file: archivePath })
+  const entries = await zip.entries()
+  const totalEntries = Object.keys(entries).length
+
+  const progressBar = new ProgressBar('-> extracting [:bar] :percent :etas', {
+    width: 40,
+    complete: '=',
+    incomplete: ' ',
+    total: totalEntries,
   })
+
+  for (const entry of Object.values(entries)) {
+    const fullPath = path.join(outputDirectory, entry.name)
+    if (entry.isDirectory) {
+      createDirectoryIfNotExists(fullPath)
+    } else {
+      createDirectoryIfNotExists(path.dirname(fullPath))
+      await zip.extract(entry.name, fullPath)
+    }
+    progressBar.tick()
+  }
+
+  await zip.close()
+  console.log(`Extraction complete: ${outputDirectory}`)
+}
+
+const useRar = async (archivePath: string, outputPath: string) => {
+  try {
+    // Create the extractor with the file information (returns a promise)
+    const extractor = await createExtractorFromFile({
+      filepath: archivePath,
+      targetPath: outputPath,
+    })
+
+    // Extract the files
+    ;[...extractor.extract().files]
+    console.log(`Extracted to ${outputPath}`)
+  } catch (err) {
+    // May throw UnrarError, see docs
+    console.error(err)
+  }
 }
 
 export const unzipFile = async (archivePath: string, outputPath: string) => {
@@ -86,13 +126,13 @@ export const unzipFile = async (archivePath: string, outputPath: string) => {
   createDirectoryIfNotExists(outputPath)
 
   const extensionsSelect: ExtensonsSelect = {
-    '.zip': useZip,
+    '.zip': useZipWithProgress,
     '.rar': useRar,
     '.7z': useSevenZipWithProgress,
   }
   try {
     extensionsSelect[extension](archivePath, outputPath)
-  } catch {
-    console.error('Unsupported archive format:', extension)
+  } catch (err) {
+    console.error('Unsupported archive format:', extension, 'Full info:', err)
   }
 }

@@ -6,6 +6,7 @@ import { findURIUsingAddress, manualSelectUI } from './manualSelect'
 import { CDNAddress, CDNNames } from './types'
 import { downloadFileWithProgressBar } from './downloadService'
 import { unzipFile } from './unzipperService'
+import { getFilenameWithoutExtension } from './util'
 
 export const aquireDownloadLink = (hostname: string, URL: string) => {
   // Define request options
@@ -43,7 +44,10 @@ export const aquireDownloadLink = (hostname: string, URL: string) => {
         filename,
         './down',
       )
-      await unzipFile(filedownloaded, './unzipped')
+      await unzipFile(
+        './down/Eli_Armour_Compendium.rar',
+        `./unzipped/${await getFilenameWithoutExtension(filename)}`,
+      )
     })
   })
 

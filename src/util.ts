@@ -9,3 +9,8 @@ export const createDirectoryIfNotExists = async (directory: string) => {
     fs.mkdirSync(directory, { recursive: true })
   }
 }
+
+export const getFilenameWithoutExtension = async (filePath: string) => {
+  const path = await import('path')
+  return path.parse(filePath).name
+}

@@ -49,7 +49,12 @@ export const aquireDownloadLink = (hostname: string, URL: string) => {
       //   filedownloaded, //'./down/Eli_Armour_Compendium.rar',
       //   `./unzipped/${await getFilenameWithoutExtension(filename)}`,
       // )
-      await executeFileManipulation(FileActionsList.delete, './moved')
+      //await executeFileManipulation(FileActionsList.delete, './moved')
+      await executeFileManipulation(
+        FileActionsList.copySequentially,
+        './from',
+        './to',
+      )
     })
   })
 

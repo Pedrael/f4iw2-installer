@@ -2,10 +2,13 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createDirectoryIfNotExists } from './util'
 
+const configPath = path.join(__dirname, 'config/loadorder.json')
+
 export enum FileActionsList {
   move = 'MOVE',
   delete = 'DELETE',
   copy = 'COPY',
+  copySequentially = 'COPYSEQUENTIALLY',
 }
 
 type ActionFunction = (
@@ -53,6 +56,51 @@ const deleteDirectory: ActionFunction = async (directoryPath) => {
   }
 }
 
+const copyFilesWithOverwrite: ActionFunction = async (
+  sourcePath,
+  destinationPath,
+) => {
+  try {
+    const files = await fs.readdir(sourcePath)
+
+    for (const file of files) {
+      const sourceFilePath = path.join(sourcePath, file)
+      const destinationFilePath = path.join(destinationPath, file)
+
+      const sourceStat = await fs.stat(sourceFilePath)
+      await fs.copy(sourceFilePath, destinationFilePath, { overwrite: true })
+      console.log(`Copied file: ${sourceFilePath} to ${destinationFilePath}`)
+    }
+    return true
+  } catch (err) {
+    console.error('Error copying files:', err)
+    return false
+  }
+}
+
+const copyDirectoriesSequentially: ActionFunction = async (
+  sourceBasePath,
+  destinationDir,
+) => {
+  try {
+    const config = await fs.readJson(configPath)
+
+    await fs.ensureDir(destinationDir)
+
+    for (const folderName of config.order) {
+      const sourceDir = path.join(sourceBasePath, folderName)
+      console.log(`Starting to copy from ${folderName}...`)
+      await copyFilesWithOverwrite(sourceDir, destinationDir)
+      console.log(`Finished copying from ${folderName}`)
+    }
+    console.log('All folders have been copied successfully.')
+    return true
+  } catch (err) {
+    console.error('Error processing configuration or copying folders:', err)
+    return false
+  }
+}
+
 export const executeFileManipulation = (
   action: FileActionsList,
   sourcePath: string,
@@ -60,7 +108,8 @@ export const executeFileManipulation = (
 ) => {
   destinationPath && createDirectoryIfNotExists(destinationPath)
   const fileActions = {
-    [FileActionsList.copy]: copyDirectory,
+    [FileActionsList.copy]: copyFilesWithOverwrite,
+    [FileActionsList.copySequentially]: copyDirectoriesSequentially,
     [FileActionsList.delete]: deleteDirectory,
     [FileActionsList.move]: moveDirectory,
   }

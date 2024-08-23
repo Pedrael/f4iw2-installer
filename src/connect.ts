@@ -8,6 +8,7 @@ import { downloadFileWithProgressBar } from './downloadService'
 import { unzipFile } from './unzipperService'
 import { getFilenameWithoutExtension } from './util'
 import { executeFileManipulation, FileActionsList } from './fileManipulator'
+import { runFomodInstaller } from './fomodParcer'
 
 export const aquireDownloadLink = (hostname: string, URL: string) => {
   // Define request options
@@ -50,11 +51,12 @@ export const aquireDownloadLink = (hostname: string, URL: string) => {
       //   `./unzipped/${await getFilenameWithoutExtension(filename)}`,
       // )
       //await executeFileManipulation(FileActionsList.delete, './moved')
-      await executeFileManipulation(
-        FileActionsList.copySequentially,
-        './from',
-        './to',
-      )
+      // await executeFileManipulation(
+      //   FileActionsList.copySequentially,
+      //   './from',
+      //   './to',
+      // )
+      runFomodInstaller()
     })
   })
 

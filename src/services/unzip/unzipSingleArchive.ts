@@ -4,7 +4,7 @@ import { createExtractorFromFile } from 'node-unrar-js'
 import fs from 'fs'
 import path from 'path'
 import ProgressBar from 'progress'
-import { createDirectoryIfNotExists } from './util'
+import { createDirectoryIfNotExists } from '../../util'
 
 type UnzipperFunction = (archivePath: string, outputPath: string) => void
 type ExtensonsSelect = Record<string, UnzipperFunction>

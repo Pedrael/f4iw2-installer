@@ -41,6 +41,7 @@ export const mainMenu = async (): Promise<void> => {
 
 const unzip = async () => {
   await unzipArchivesList('./downloaded', './unzipped')
+  mainMenu()
 }
 
 const doFomodInstallation = (): void => {

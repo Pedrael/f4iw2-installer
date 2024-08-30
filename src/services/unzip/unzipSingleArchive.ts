@@ -20,44 +20,48 @@ const useSevenZip = (archivePath: string, outputPath: string) => {
 const useSevenZipWithProgress = (
   archivePath: string,
   outputDirectory: string,
-) => {
-  createDirectoryIfNotExists(outputDirectory)
+): Promise<void> =>
+  new Promise((resolve, reject) => {
+    createDirectoryIfNotExists(outputDirectory)
 
-  SevenZip.list(archivePath, (err, result) => {
-    if (err) {
-      console.error('Error listing 7z archive contents:', err)
-      return
-    }
-
-    const totalEntries = result.length
-
-    const progressBar = new ProgressBar('-> extracting [:bar] :percent :etas', {
-      width: 40,
-      complete: '=',
-      incomplete: ' ',
-      total: totalEntries,
-    })
-
-    SevenZip.unpack(archivePath, outputDirectory, (err) => {
+    SevenZip.list(archivePath, (err, result) => {
       if (err) {
-        console.error('Error extracting 7z archive:', err)
-        return
+        console.error('Error listing 7z archive contents:', err)
+        return reject(err)
       }
-      console.log(`Extraction complete: ${outputDirectory}`)
-    })
 
-    // Simulate progress for 7z extraction (7zip-min does not provide progress events)
-    let extractedEntries = 0
-    const interval = setInterval(() => {
-      if (extractedEntries < totalEntries) {
-        extractedEntries += Math.ceil(totalEntries / 100)
-        progressBar.tick(Math.ceil(totalEntries / 100))
-      } else {
-        clearInterval(interval)
-      }
-    }, 100)
+      const totalEntries = result.length
+      const progressBar = new ProgressBar(
+        '-> extracting [:bar] :percent :etas',
+        {
+          width: 40,
+          complete: '=',
+          incomplete: ' ',
+          total: totalEntries,
+        },
+      )
+
+      SevenZip.unpack(archivePath, outputDirectory, (err) => {
+        if (err) {
+          console.error('Error extracting 7z archive:', err)
+          return reject(err)
+        }
+        console.log(`Extraction complete: ${outputDirectory}`)
+        resolve()
+      })
+
+      // Simulate progress for 7z extraction (7zip-min does not provide progress events)
+      let extractedEntries = 0
+      const interval = setInterval(() => {
+        if (extractedEntries < totalEntries) {
+          extractedEntries += Math.ceil(totalEntries / 100)
+          progressBar.tick(Math.ceil(totalEntries / 100))
+        } else {
+          clearInterval(interval)
+        }
+      }, 100)
+    })
   })
-}
 
 const useZip = async (archivePath: string, outputPath: string) => {
   const zip = new StreamZip.async({ file: archivePath })
@@ -74,7 +78,7 @@ const useZip = async (archivePath: string, outputPath: string) => {
 const useZipWithProgress = async (
   archivePath: string,
   outputDirectory: string,
-) => {
+): Promise<void> => {
   createDirectoryIfNotExists(outputDirectory)
 
   const zip = new StreamZip.async({ file: archivePath })

@@ -2,7 +2,7 @@ import axios from 'axios'
 import ProgressBar from 'progress'
 import fs from 'fs'
 import path from 'path'
-import { createDirectoryIfNotExists, sanitizeFilename } from './util'
+import { createDirectoryIfNotExists, sanitizeFilename } from '../../util'
 
 export const downloadFileWithProgressBar = async (
   url: string,

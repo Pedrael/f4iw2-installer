@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { createDirectoryIfNotExists } from './util'
+import { createDirectoryIfNotExists } from '../../util'
 
 const configPath = path.join(__dirname, 'config/loadorder.json')
 

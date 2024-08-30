@@ -24,7 +24,6 @@
     "commander": "^12.1.0",
     "fomod": "^0.2.5",
     "fs-extra": "^11.2.0",
-    "jsdom": "^24.1.1",
     "node-stream-zip": "^1.15.0",
     "node-unrar-js": "^2.0.2",
     "nodemon": "^3.1.4",

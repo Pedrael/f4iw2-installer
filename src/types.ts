@@ -12,3 +12,13 @@ export enum CDNNames {
   LA = 'Los Angeles',
   Miami = 'Miami',
 }
+
+export type Mod = {
+  mod_id: string
+  id: string
+}
+
+export type ModsList = {
+  domain_name: string
+  mods_list: Mod[]
+}

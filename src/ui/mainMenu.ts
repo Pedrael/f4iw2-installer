@@ -6,8 +6,8 @@ import {
   executeFileManipulation,
   FileActionsList,
 } from '../services/deployment/fileManipulator'
-import { runFomodInstaller } from '../fomod/fomodParcer'
 import { unzipArchivesList } from '../services/unzip/unzipArchivesList'
+import { installFomodMods } from '../fomod/installFomodMods'
 
 enum MainOptionsList {
   Download = '1. Download Mods',
@@ -44,9 +44,11 @@ const unzip = async () => {
   mainMenu()
 }
 
-const doFomodInstallation = (): void => {
+const doFomodInstallation = async () => {
   console.log('Doing FOMOD installation...')
-  runFomodInstaller()
+  await installFomodMods()
+  mainMenu()
+  //runFomodInstaller()
   // Add your FOMOD installation logic here
 }
 

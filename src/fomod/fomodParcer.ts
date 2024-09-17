@@ -3,14 +3,8 @@ import { readFileSync } from 'fs'
 import { parseStringPromise } from 'xml2js'
 import inquirer from 'inquirer'
 
-const pathToXML = path.join(
-  './from/CBBE 3BA (3BBB)-30174-2-47-1676473395/fomod',
-)
-const moduleConfigPath = path.join(pathToXML, '/ModuleConfig.xml')
-const metadataPath = path.join(pathToXML, '/Info.xml')
-
-const parseFomodXml = async (filePath: string) =>
-  await parseStringPromise(readFileSync(filePath, 'utf16le'))
+export const parseFomodXml = async (filePath: string) =>
+  await parseStringPromise(readFileSync(filePath)) // add encode as second param if it fucks up
 
 type InstallOption = {
   name: string
@@ -18,7 +12,7 @@ type InstallOption = {
   filePaths: string[]
 }
 
-const getInstallOptions = (parsedFomod: any): InstallOption[] => {
+export const getInstallOptions = (parsedFomod: any): InstallOption[] => {
   const options: InstallOption[] = []
   const installSteps = parsedFomod?.config?.installSteps?.[0]?.installStep
 
@@ -65,7 +59,7 @@ const getInstallOptions = (parsedFomod: any): InstallOption[] => {
   return options
 }
 
-async function promptUser(installOptions: InstallOption[]) {
+export async function promptUser(installOptions: InstallOption[]) {
   const choices = installOptions.map((option) => ({
     name: `${option.name} - ${option.description}`,
     value: option,
@@ -84,11 +78,11 @@ async function promptUser(installOptions: InstallOption[]) {
 }
 
 // Example usage
-export const runFomodInstaller = async () => {
-  const parsedFomod = await parseFomodXml(moduleConfigPath)
-  const installOptions = getInstallOptions(parsedFomod)
-  console.log(JSON.stringify(installOptions, null, 1))
-  //const selectedOptions = await promptUser(installOptions)
-  //console.log('You selected:', selectedOptions)
-  // Process selected options...
-}
+// export const runFomodInstaller = async () => {
+//   const parsedFomod = await parseFomodXml(moduleConfigPath)
+//   const installOptions = getInstallOptions(parsedFomod)
+//   console.log(JSON.stringify(installOptions, null, 1))
+//   //const selectedOptions = await promptUser(installOptions)
+//   //console.log('You selected:', selectedOptions)
+//   // Process selected options...
+// }

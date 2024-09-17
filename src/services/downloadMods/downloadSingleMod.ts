@@ -16,7 +16,6 @@ export const downloadFileWithProgressBar = async (
       console.log(`File already exists, skip: ${sanitizedFilename}`)
       return filename
     }
-
     const { data, headers } = await axios({
       url,
       method: 'GET',
